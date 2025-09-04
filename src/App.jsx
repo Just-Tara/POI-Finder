@@ -8,12 +8,21 @@ function App() {
   const [selectedPlace, setSelectedPlace] = useState(null); // clicked marker
 
   // Get user location
+
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
-      () => setUserPosition([6.5244, 3.3792]) // fallback to Lagos
-    );
-  }, []);
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      console.log("User location:", pos.coords);
+      setUserPosition([pos.coords.latitude, pos.coords.longitude]);
+    },
+    (err) => {
+      console.error("Geolocation error:", err);
+      // fallback Lagos
+      setUserPosition([6.5244, 3.3792]);
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}, []);
 
   return (
     <div className="flex h-screen w-screen">
@@ -34,3 +43,4 @@ function App() {
 }
 
 export default App;
+

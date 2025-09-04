@@ -8,19 +8,19 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
   const [results, setResults] = useState([]);
   const [searchHistorys, setSearchHistorys] = useState([]);
 
-  // ✅ Add to history
+  // Add to history
   function addSearch() {
     if (search.trim() !== "") {
       setSearchHistorys((s) => [...s, search]);
     }
   }
 
-  // ✅ Delete from history
+  // Delete from history
   function deleteSearch(index) {
     setSearchHistorys((s) => s.filter((_, i) => i !== index));
   }
 
-  // ✅ Mapping for Overpass queries
+  // Mapping for Overpass queries
   const poiMap = {
     restaurant: '["amenity"="restaurant"]',
     food: '["amenity"~"restaurant|fast_food|food_court"]',
@@ -32,7 +32,7 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
     mall: '["shop"="mall"]',
   };
 
-  // ✅ Handle typing input
+  // Handle typing input
   const handleSearch = async (e) => {
     const value = e.target.value;
     setSearch(value);
@@ -66,7 +66,7 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
         const places = data.elements.map((el) => ({
           id: el.id,
           place_name: el.tags.name || `Unnamed ${keyword}`,
-          center: [el.lon, el.lat],
+          center: [el.lat, el.lon],
           markerColor: "darkorange",
         }));
 
@@ -99,7 +99,7 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
     }
   };
 
-  // ✅ Handle clicking a dropdown place
+  //  Handle clicking a dropdown place
   const handleSelectPlace = (place) => {
     const placeWithColor = { ...place, markerColor: "darkorange" };
     setSelectedPlace(placeWithColor);
@@ -109,7 +109,7 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
     setIsMenuOpen(false);
   };
 
-  // ✅ Handle pressing search button
+  //Handle pressing search button
   const handleSearchSubmit = async () => {
     if (!search || !userPosition) return;
 
@@ -217,7 +217,7 @@ function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
             </button>
 
             <h2 className="text-xl font-semibold mb-4">Search Location</h2>
-            <div className="flex">
+           <div className="flex"> 
               <input
                 type="text"
                 value={search}

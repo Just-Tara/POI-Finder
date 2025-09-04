@@ -1,8 +1,21 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
+import {useState, useEffect } from "react";
 import L from "leaflet";
 
+
+
+function haversineDistance([lat1, lon1], [lat2, lon2]) {
+  const R = 6371; // Earth radius in km
+  const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
 // helper function
 
 const searchIcon = (color = "darkorange") =>
@@ -56,7 +69,7 @@ function MapComponent({ userPosition, places, selectedPlace }) {
 
         {/* User location */}
         <Marker position={userPosition}>
-          <Popup>Your Location 🚩</Popup>
+          <Popup>Your Location </Popup>
         </Marker>
 
         {/* All search markers */}
@@ -76,8 +89,39 @@ function MapComponent({ userPosition, places, selectedPlace }) {
                         </Marker>
                       )
                   )}
-        {/* Fly to selected */}
+        {/* Fly to selected */} 
         {selectedPlace && <FlyToPlace place={selectedPlace} />}
+
+        {/* Line and selected marker */}  
+         {userPosition && selectedPlace?.center && (
+          <>
+            <Polyline
+              positions={[
+                userPosition,
+                [selectedPlace.center[1], selectedPlace.center[0]],
+              ]}
+              color="#0096FF"
+            />
+            <Marker
+              icon={searchIcon("darkorange")}
+              position={[selectedPlace.center[1], selectedPlace.center[0]]}
+            >
+              <Popup>
+                <strong>{selectedPlace.text || "Selected Place"}</strong>
+                <br />
+                {selectedPlace.place_name}
+                <br />
+                Distance:{" "}
+                {haversineDistance(
+                  userPosition,
+                  [selectedPlace.center[1], selectedPlace.center[0]]
+                ).toFixed(2)}{" "}
+                km
+              </Popup>
+            </Marker>
+          </>
+        )}
+       
       </MapContainer>
     </div>
   );
