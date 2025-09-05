@@ -111,9 +111,9 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
   const { key, value } = filter;
   const [lat, lng] = userPosition;
 
-  let radius = 2000; // start with 2 km
-  const maxRadius = 20000; // max 20 km
-  const step = 2000; // increment by 2 km each time
+  let radius = 8000; 
+  const maxRadius = 20000; 
+  const step = 2000; 
   let results = [];
 
   while (radius <= maxRadius && results.length === 0) {
@@ -248,6 +248,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       markerColor: place.markerColor || "blue",
     });
     setPlaces([{ ...place, center: leafletPosition }]);
+    setSearchResults([]);
   };
 
   // Handles submitting the search query via the button
