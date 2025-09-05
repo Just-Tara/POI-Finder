@@ -43,7 +43,7 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
         { name: "Supermarkets", key: "shop", value: "supermarket" },
         { name: "Pharmacies", key: "shop", value: "pharmacy" },
       ],
-      color: "dodgerblue",
+      color: "darkorange",
     },
     services: {
       label: "Services",
@@ -52,7 +52,7 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
         { name: "Banks", key: "amenity", value: "bank" },
         { name: "Post Offices", key: "amenity", value: "post_office" },
       ],
-      color: "forestgreen",
+      color: "darkorange",
     },
     education: {
       label: "Education",
@@ -60,7 +60,7 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
         { name: "Schools", key: "amenity", value: "school" },
         { name: "Universities", key: "amenity", value: "university" },
       ],
-      color: "goldenrod",
+      color: "darkorange",
     },
     tourism: {
       label: "Tourism",
@@ -69,11 +69,10 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
         { name: "Museums", key: "tourism", value: "museum" },
         { name: "Parks", key: "leisure", value: "park" },
       ],
-      color: "mediumpurple",
+      color: "darkorange",
     },
   };
 
-  // --- History Management (Using localStorage, consider Firestore for persistence across devices) ---
   useEffect(() => {
     const savedHistory = localStorage.getItem("searchHistory");
     if (savedHistory) {
