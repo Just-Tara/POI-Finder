@@ -9,19 +9,18 @@ function App() {
 
   // Get user location
 
-  useEffect(() => {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      console.log("User location:", pos.coords);
-      setUserPosition([pos.coords.latitude, pos.coords.longitude]);
-    },
-    (err) => {
-      console.error("Geolocation error:", err);
-      // fallback Lagos
-      setUserPosition([6.5244, 3.3792]);
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  );
+useEffect(() => {
+  if (!userPosition) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = [pos.coords.latitude, pos.coords.longitude];
+        setUserPosition(coords);
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+      }
+    );
+  }
 }, []);
 
   return (

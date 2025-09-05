@@ -1,12 +1,43 @@
-# React + Vite
+# 🌍 Interactive Map Search App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive map application built with **React, Vite, Leaflet, and Mapbox**, that allows users to:
 
-Currently, two official plugins are available:
+- Search for **places and addresses** using Mapbox Geocoding API.
+- Explore **Points of Interest (POIs)** like Restaurants, Hospitals, Banks, Parks, etc. using **Overpass API (OpenStreetMap data)**.
+- View results on the map with **custom markers**.
+- Save and manage **search history**.
+- Mobile and desktop responsive interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🚀 **Live Demo:** [View on GitHub Pages]()
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Features
+- 🔎 Search by keyword or address  
+- ⚡ Quick search for popular categories (Food, Shopping, Services, Education, Tourism)  
+- 📍 Detects and centers around your current location  
+- 🗂 Maintains search history (stored in localStorage)  
+- 📱 Responsive design (works on mobile and desktop)  
+
+---
+
+## 🛠 Tech Stack
+- [React](https://react.dev/) + [Vite](https://vitejs.dev/)  
+- [Leaflet](https://leafletjs.com/) for interactive maps  
+- [Mapbox Geocoding API](https://docs.mapbox.com/api/search/geocoding/)  
+- [Overpass API](https://overpass-api.de/) for POI search  
+- [Tailwind CSS](https://tailwindcss.com/) for styling  
+
+---
+
+## 📂 Project Structure
+├── public/ # Static assets
+├── src/
+│ ├── components/ # React components
+│ ├── App.jsx # Main app
+│ ├── main.jsx # Entry point
+│ └── styles.css # Global styles
+├── index.html
+├── vite.config.js
+├── package.json
+└── README.md
