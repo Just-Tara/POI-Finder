@@ -143,7 +143,7 @@ return (
                       </p>
                     )}
                     <button
-                      className="mt-2 px-3.5 py-2 bg-blue-500 text-white rounded"
+                      className="mt-2 px-3.5 py-2 bg-blue-500 text-white rounded cursor-pointer"
                       onClick={() => fetchRouteToPlace(place)}
                     >
                       Show Driving Route

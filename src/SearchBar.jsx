@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
-// A utility function to debounce API calls and other expensive operations.
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -15,13 +15,13 @@ function debounce(func, wait) {
   };
 }
 
-// The main SearchBar component for searching points of interest and addresses.
+// The main SearchBar component
 export default function SearchBar({ userPosition, setPlaces, setSelectedPlace }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [message, setMessage] = useState(""); // State for displaying messages to the user
+  const [message, setMessage] = useState(""); 
 
   // --- POI Categories and Keywords ---
   const poiCategories = {
@@ -35,6 +35,7 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
         { name: "Food Trucks", key: "amenity", value: "street_food" },
       ],
       color: "darkorange",
+
     },
     shopping: {
       label: "Shopping",
@@ -168,7 +169,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
     const [lat, lng] = userPosition;
     const proximity = `${lng},${lat}`;
 
-    // IMPORTANT: Make sure this Mapbox token is valid. An invalid token will cause the search to fail silently.
+  
     const mapboxToken = "pk.eyJ1IjoianVzdC10YXJhMjIiLCJhIjoiY21mMGUxZ2toMDBtZzJrc2FlNWRzcDl6aCJ9.oyosw0Zns7GNkLYPiKESSQ";
 
     try {
@@ -183,13 +184,12 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
         data.features?.map((f) => ({
           id: f.id,
           place_name: f.place_name,
-          center: f.center, // Mapbox returns [longitude, latitude]
+          center: f.center, 
           text: f.text,
           properties: f.properties,
-          markerColor: "blue",
-          source: "mapbox", // Identify the source of the data
+          markerColor: "darkorange",
+          source: "mapbox", 
         })) || [];
-
       return features;
     } catch (err) {
       console.error("Mapbox Geocoding API error:", err);
@@ -197,7 +197,6 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
     }
   };
 
-  // Debounced handler for text input changes
   const debouncedHandleSearch = debounce(async (value) => {
     if (!userPosition || value.trim().length < 2) {
       setSearchResults([]);
@@ -206,7 +205,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
 
     let foundPlaces = [];
 
-    // Prioritize a quick, specific POI search
+    
     for (const categoryKey in poiCategories) {
       for (const poi of poiCategories[categoryKey].queries) {
         if (value.toLowerCase().includes(poi.name.toLowerCase())) {
@@ -217,7 +216,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       if (foundPlaces.length > 0) break;
     }
 
-    // If no specific POI was found via keywords, or if input is more generic, try Mapbox
+    
     if (foundPlaces.length === 0) {
       foundPlaces = await performMapboxSearch(value);
     }
@@ -228,15 +227,15 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    setMessage(""); // Clear message on new input
+    setMessage(""); 
     debouncedHandleSearch(value);
   };
 
-  // Handles selecting a place from the dropdown
+
   const handleSelectPlace = (place) => {
     let leafletPosition = place.center;
 
-    // Correct the coordinate order for Mapbox results
+ 
     if (place.source === "mapbox" && place.center) {
       leafletPosition = [place.center[1], place.center[0]];
     }
@@ -250,7 +249,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
     setSearchResults([]);
   };
 
-  // Handles submitting the search query via the button
+  // Handles submitting the search query
   const handleSearchSubmit = async () => {
     if (!searchQuery || !userPosition) {
       setMessage("Please enter a search query or wait for your location to be determined.");
@@ -259,7 +258,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
     
     let foundPlaces = [];
 
-    // Prioritize POI search first
+    //  POI search first
     for (const categoryKey in poiCategories) {
       for (const poi of poiCategories[categoryKey].queries) {
         if (searchQuery.toLowerCase().includes(poi.name.toLowerCase())) {
@@ -288,15 +287,14 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       setSelectedPlace(placesWithCorrectedCoords[0]);
       setSearchResults([]);
       addSearchToHistory(searchQuery);
-      setMessage(""); // Clear message on success
-    } else {
+    }else {
       setMessage("No results found for your search.");
       setPlaces([]);
       setSelectedPlace(null);
     }
   };
 
-  // Handles quick search button clicks
+  // Handles search button clicks
   const handleQuickSearch = async (keyword) => {
     let categoryKey = null;
     let poi = null;
@@ -317,7 +315,8 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       return;
     }
     
-    setMessage(""); // Clear message before searching
+    setMessage("");
+    setMessage("Searching...")
     const places = await performOverpassSearch(poi, categoryKey, poi.name);
 
     if (places.length > 0) {
@@ -327,6 +326,8 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       setSearchResults([]);
       setIsMenuOpen(false);
       addSearchToHistory(poi.name);
+
+      setMessage('Result found')
     } else {
       setMessage(`No ${poi.name} found near your location.`);
       setPlaces([]);
@@ -354,9 +355,18 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </button>
         </div>
-        {message && (
-          <div className="text-sm text-red-500 p-2 text-center rounded-md bg-red-50 mb-2">{message}</div>
-        )}
+            {message && (
+        <div
+          className={`text-sm p-2 text-center rounded-md mb-2 ${
+            message.toLowerCase().includes("no") || message.toLowerCase().includes("error")
+              ? "text-red-500 bg-red-50"
+              : "text-gray-700 bg-gray-100"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+
         <div className="mb-4">
           <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
           <div className="flex flex-wrap gap-2">
@@ -364,14 +374,14 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
               <button
                 key={categoryKey}
                 onClick={() => handleQuickSearch(category.queries[0].name)}
-                className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700"
+                className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
               >
                 {category.label}
               </button>
             ))}
             <button
               onClick={() => handleQuickSearch("Food Trucks")}
-              className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700"
+              className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
             >
               Food Trucks
             </button>
@@ -425,7 +435,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       {/* Mobile View */}
       <button
         onClick={() => setIsMenuOpen(true)}
-        className="absolute left-3 top-4 z-[1000] p-2 text-3xl lg:hidden"
+        className="absolute left-3 top-4 z-[1000] p-2 text-3xl cursor-pointer lg:hidden"
         aria-label="Open search menu"
       >
         ☰
@@ -436,7 +446,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
           <div className="bg-white h-full shadow-lg p-6 w-80 md:w-120 flex flex-col">
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="self-end p-2 text-2xl text-gray-600 hover:text-red-500"
+              className="self-end p-2 text-2xl text-gray-600 hover:text-red-500 cursor-pointer"
               aria-label="Close search menu"
             >
               ✕
@@ -454,13 +464,21 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
               />
               <button
                 onClick={handleSearchSubmit}
-                className="w-16 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 flex justify-center items-center"
+                className="w-16 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 flex justify-center items-center cursor-pointer"
               >
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </div>
-            {message && (
-              <div className="text-sm text-red-500 p-2 text-center rounded-md bg-red-50 mb-2">{message}</div>
+           {message && (
+        <div
+                className={`text-sm p-2 text-center rounded-md mb-2 ${
+                  message.toLowerCase().includes("no") || message.toLowerCase().includes("error")
+                    ? "text-red-500 bg-red-50"
+                    : "text-gray-700 bg-gray-100"
+                }`}
+              >
+                {message}
+              </div>
             )}
             <div className="mb-4">
               <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
@@ -469,14 +487,14 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
                   <button
                     key={categoryKey}
                     onClick={() => handleQuickSearch(category.queries[0].name)}
-                    className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700"
+                    className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
                   >
                     {category.label}
                   </button>
                 ))}
                 <button
                   onClick={() => handleQuickSearch("Food Trucks")}
-                  className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700"
+                  className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
                 >
                   Food Trucks
                 </button>
