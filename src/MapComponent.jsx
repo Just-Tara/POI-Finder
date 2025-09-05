@@ -4,101 +4,78 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Make sure to import the polyline decoder if you use encoded polylines
-// import polyline from "@mapbox/polyline";
 
-// --- Helper Functions (haversineDistance, searchIcon, FlyToPlace) ---
-// (Keep your existing functions here)
 function haversineDistance([lat1, lon1], [lat2, lon2]) {
-  const R = 6371; // Earth radius in km
-  const toRad = (x) => (x * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+ const R = 6371; // Earth radius in km
+ const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+const dLon = toRad(lon2 - lon1);
+ const a =
+ Math.sin(dLat / 2) ** 2 +
+ Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+ Math.sin(dLon / 2) ** 2;  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
 const searchIcon = (color = "darkorange") =>
-  L.divIcon({
-    className: "",
-    html: `
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
-                <path d="M15 0C9 0 4 6 4 13c0 10 11 27 11 27s11-17 11-27c0-7-5-13-11-13z" 
-              fill="${color}" />
-                <circle cx="15" cy="13" r="5" fill="white" />
-      </svg>
-    `,
-    iconSize: [30, 40],
-    iconAnchor: [15, 40],
-    popupAnchor: [0, -35],
-  });
+   L.divIcon({
+   className: "",
+   html: `
+   <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
+     <path d="M15 0C9 0 4 6 4 13c0 10 11 27 11 27s11-17 11-27c0-7-5-13-11-13z" 
+     fill="${color}" />
+     <circle cx="15" cy="13" r="5" fill="white" />
+       </svg>
+ `,
+     iconSize: [30, 40],
+     iconAnchor: [15, 40],
+     popupAnchor: [0, -35],
+ });
 
-function FlyToPlace({ place }) {
-  const map = useMap();
-  useEffect(() => {
-    if (place?.center) {
-      map.flyTo([place.center[1], place.center[0]], 13, { duration: 1.5 });
-    }
-  }, [place, map]);
-  return null;
+function FlyToPlace({ place }) {  
+   const map = useMap();
+ useEffect(() => {
+ if (place?.center) {
+ map.flyTo([place.center[1], place.center[0]], 13, { duration: 1.5 });
 }
-// --- End Helper Functions ---
+ }, [place, map]);
+ return null;
+}
 
-// Define your Mapbox token (replace with your actual token)
-// It's best to load this from environment variables or a config file
-const MAPBOX_TOKEN = "pk.eyJ1IjoianVzdC10YXJhMjIiLCJhIjoiY21mMGUxZ2toMDBtZzJrc2FlNWRzcDl6aCJ9.oyosw0Zns7GNkLYPiKESSQ"; // <- Replace with your token or use process.env.REACT_APP_MAPBOX_TOKEN
+const MAPBOX_TOKEN = "pk.eyJ1IjoianVzdC10YXJhMjIiLCJhIjoiY21mMGUxZ2toMDBtZzJrc2FlNWRzcDl6aCJ9.oyosw0Zns7GNkLYPiKESSQ"; 
 
 function MapComponent({ userPosition, places, selectedPlace }) {
-  const [route, setRoute] = useState(null); // State to store the route coordinates
+  const [route, setRoute] = useState(null); 
 
-  // Effect to fetch route whenever userPosition or selectedPlace changes
-  useEffect(() => {
-    // Only fetch if we have both user position and a selected place
-    if (!userPosition || !selectedPlace?.center) {
-      setRoute(null); // Clear route if either is missing
-      return;
+
+ useEffect(() => {
+  if (!userPosition || !selectedPlace?.center) {
+    setRoute(null);
+    return;
+  }
+
+  const fetchRoute = async () => {
+    const origin = `${userPosition[1]},${userPosition[0]}`;
+    const destination = `${selectedPlace.center[0]},${selectedPlace.center[1]}`;
+    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin};${destination}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.routes && data.routes.length > 0) {
+      setRoute(data.routes[0].geometry.coordinates);
+    } else {
+      setRoute(null);
     }
+  };
 
-    const fetchRoute = async () => {
-      // Note: Mapbox directions API uses longitude,latitude format for coordinates
-      const origin = `${userPosition[1]},${userPosition[0]}`;
-      const destination = `${selectedPlace.center[0]},${selectedPlace.center[1]}`;
-      // Using `geometries=geojson` returns coordinates in GeoJSON format
-      const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin};${destination}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
-
-      try {
-        const res = await fetch(url);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-
-        // Check if routes were returned and extract coordinates
-        if (data.routes && data.routes.length > 0) {
-          // The geometry from GeoJSON is an array of [longitude, latitude] pairs
-          const routeCoordinates = data.routes[0].geometry.coordinates;
-          setRoute(routeCoordinates); // Store the coordinates
-        } else {
-          console.warn("No driving route found.");
-          setRoute(null); // Clear route if none found
-        }
-      } catch (err) {
-        console.error("Error fetching route:", err);
-        setRoute(null); // Clear route on error
-      }
-    };
-
-    fetchRoute();
-  }, [userPosition, selectedPlace]); // Dependencies: re-fetch if these change
+  fetchRoute();
+}, [userPosition, selectedPlace]);
 
   return (
     <div className="flex-1 relative">
       <MapContainer
         // Ensure center is provided if userPosition might be null initially
-        center={userPosition || [51.505, -0.09]} // Default center if no user position
+        center={userPosition || [51.505, -0.09]} 
         zoom={13}
         zoomControl={false}
         attributionControl={false}
@@ -112,7 +89,7 @@ function MapComponent({ userPosition, places, selectedPlace }) {
         />
 
         {/* User location */}
-        {userPosition && ( // Conditionally render marker if userPosition exists
+        {userPosition && (
           <Marker position={userPosition}>
             <Popup>Your Location</Popup>
           </Marker>
@@ -162,15 +139,14 @@ function MapComponent({ userPosition, places, selectedPlace }) {
         {selectedPlace && <FlyToPlace place={selectedPlace} />}
 
         {/* Driving Route Polyline */}
-        {route && ( // Render the polyline only if route data exists
+       {route && (
           <Polyline
-            positions={route.map(coord => [coord[1], coord[0]])} // Convert [lon, lat] from GeoJSON to [lat, lon] for Leaflet
-            color="#0096FF" // Example color
-            weight={5}     // Example weight
+            positions={route.map(coord => [coord[1], coord[0]])} // [lat, lon] for Leaflet
+            color="#0096FF"
+            weight={5}
           />
         )}
 
-        {/* Selected marker (this is separate from the route fetching logic) */}
       </MapContainer>
     </div>
   );

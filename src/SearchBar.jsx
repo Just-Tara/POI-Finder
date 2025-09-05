@@ -248,10 +248,6 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       markerColor: place.markerColor || "blue",
     });
     setPlaces([{ ...place, center: leafletPosition }]);
-    setSearchQuery(place.place_name);
-    setSearchResults([]);
-    setIsMenuOpen(false);
-    addSearchToHistory(place.place_name);
   };
 
   // Handles submitting the search query via the button
