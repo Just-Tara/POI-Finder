@@ -22,6 +22,7 @@ export default function SearchBar({ userPosition, setPlaces, setSelectedPlace })
   const [searchResults, setSearchResults] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
   const [message, setMessage] = useState(""); 
+  const [messageType, setMessageType] = useState("info"); 
 
   // --- POI Categories and Keywords ---
   const poiCategories = {
@@ -253,6 +254,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
   const handleSearchSubmit = async () => {
     if (!searchQuery || !userPosition) {
       setMessage("Please enter a search query or wait for your location to be determined.");
+      setMessageType("error");
       return;
     }
     
@@ -289,6 +291,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       addSearchToHistory(searchQuery);
     }else {
       setMessage("No results found for your search.");
+      setMessageType("error");
       setPlaces([]);
       setSelectedPlace(null);
     }
@@ -317,6 +320,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
     
     setMessage("");
     setMessage("Searching...")
+    setMessageType("success");
     const places = await performOverpassSearch(poi, categoryKey, poi.name);
 
     if (places.length > 0) {
@@ -327,9 +331,11 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       setIsMenuOpen(false);
       addSearchToHistory(poi.name);
 
-      setMessage('Result found')
+      setMessage('Result found');
+      setMessageType("success");
     } else {
       setMessage(`No ${poi.name} found near your location.`);
+      setMessageType("error");
       setPlaces([]);
       setSelectedPlace(null);
     }
@@ -355,17 +361,20 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </button>
         </div>
-            {message && (
-        <div
-          className={`text-sm p-2 text-center rounded-md mb-2 ${
-            message.toLowerCase().includes("no") || message.toLowerCase().includes("error")
-              ? "text-red-500 bg-red-50"
-              : "text-gray-700 bg-gray-100"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+           {message && (
+          <div
+            className={`text-sm p-2 text-center rounded-md mb-2 ${
+              messageType === "error"
+                ? "text-red-500 bg-red-50"
+                : messageType === "success"
+                ? "text-gray-700 bg-gray-100"
+                : "text-green-600 bg-green-50"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
 
         <div className="mb-4">
           <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
@@ -469,17 +478,20 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </div>
-           {message && (
-        <div
+              {message && (
+              <div
                 className={`text-sm p-2 text-center rounded-md mb-2 ${
-                  message.toLowerCase().includes("no") || message.toLowerCase().includes("error")
+                  messageType === "error"
                     ? "text-red-500 bg-red-50"
-                    : "text-gray-700 bg-gray-100"
+                    : messageType === "success"
+                    ? "text-gray-700 bg-gray-100"
+                    : "text-green-600 bg-green-50"
                 }`}
               >
                 {message}
               </div>
             )}
+
             <div className="mb-4">
               <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
               <div className="flex flex-wrap gap-2">
