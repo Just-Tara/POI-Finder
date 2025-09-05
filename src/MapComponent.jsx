@@ -1,60 +1,104 @@
+// src/components/MapComponent.js
+import React, { useState, useEffect } from "react"; // Import useState
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import {useState, useEffect } from "react";
 import L from "leaflet";
 
+// Make sure to import the polyline decoder if you use encoded polylines
+// import polyline from "@mapbox/polyline";
 
-
+// --- Helper Functions (haversineDistance, searchIcon, FlyToPlace) ---
+// (Keep your existing functions here)
 function haversineDistance([lat1, lon1], [lat2, lon2]) {
-  const R = 6371; // Earth radius in km
-  const toRad = (x) => (x * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) ** 2;
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  const R = 6371; // Earth radius in km
+  const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
-// helper function
 
 const searchIcon = (color = "darkorange") =>
-  L.divIcon({
-    className: "",
-    html: `
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
-        <!-- Pin shape -->
-        <path d="M15 0C9 0 4 6 4 13c0 10 11 27 11 27s11-17 11-27c0-7-5-13-11-13z" 
-              fill="${color}" />
-        <!-- Inner circle to differentiate from user marker -->
-        <circle cx="15" cy="13" r="5" fill="white" />
-      </svg>
-    `,
-    iconSize: [30, 40],
-    iconAnchor: [15, 40],
-    popupAnchor: [0, -35],
-  });
-
-
-// usage when mapping markers
-
-
+  L.divIcon({
+    className: "",
+    html: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
+                <path d="M15 0C9 0 4 6 4 13c0 10 11 27 11 27s11-17 11-27c0-7-5-13-11-13z" 
+              fill="${color}" />
+                <circle cx="15" cy="13" r="5" fill="white" />
+      </svg>
+    `,
+    iconSize: [30, 40],
+    iconAnchor: [15, 40],
+    popupAnchor: [0, -35],
+  });
 
 function FlyToPlace({ place }) {
-  const map = useMap();
-  useEffect(() => {
-    if (place?.center) {
-      map.flyTo([place.center[1], place.center[0]], 13, { duration: 1.5 });
-    }
-  }, [place, map]);
-  return null;
+  const map = useMap();
+  useEffect(() => {
+    if (place?.center) {
+      map.flyTo([place.center[1], place.center[0]], 13, { duration: 1.5 });
+    }
+  }, [place, map]);
+  return null;
 }
+// --- End Helper Functions ---
+
+// Define your Mapbox token (replace with your actual token)
+// It's best to load this from environment variables or a config file
+const MAPBOX_TOKEN = "pk.eyJ1IjoianVzdC10YXJhMjIiLCJhIjoiY21mMGUxZ2toMDBtZzJrc2FlNWRzcDl6aCJ9.oyosw0Zns7GNkLYPiKESSQ"; // <- Replace with your token or use process.env.REACT_APP_MAPBOX_TOKEN
 
 function MapComponent({ userPosition, places, selectedPlace }) {
+  const [route, setRoute] = useState(null); // State to store the route coordinates
+
+  // Effect to fetch route whenever userPosition or selectedPlace changes
+  useEffect(() => {
+    // Only fetch if we have both user position and a selected place
+    if (!userPosition || !selectedPlace?.center) {
+      setRoute(null); // Clear route if either is missing
+      return;
+    }
+
+    const fetchRoute = async () => {
+      // Note: Mapbox directions API uses longitude,latitude format for coordinates
+      const origin = `${userPosition[1]},${userPosition[0]}`;
+      const destination = `${selectedPlace.center[0]},${selectedPlace.center[1]}`;
+      // Using `geometries=geojson` returns coordinates in GeoJSON format
+      const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin};${destination}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+
+        // Check if routes were returned and extract coordinates
+        if (data.routes && data.routes.length > 0) {
+          // The geometry from GeoJSON is an array of [longitude, latitude] pairs
+          const routeCoordinates = data.routes[0].geometry.coordinates;
+          setRoute(routeCoordinates); // Store the coordinates
+        } else {
+          console.warn("No driving route found.");
+          setRoute(null); // Clear route if none found
+        }
+      } catch (err) {
+        console.error("Error fetching route:", err);
+        setRoute(null); // Clear route on error
+      }
+    };
+
+    fetchRoute();
+  }, [userPosition, selectedPlace]); // Dependencies: re-fetch if these change
+
   return (
     <div className="flex-1 relative">
       <MapContainer
-        center={userPosition}
+        // Ensure center is provided if userPosition might be null initially
+        center={userPosition || [51.505, -0.09]} // Default center if no user position
         zoom={13}
         zoomControl={false}
         attributionControl={false}
@@ -68,60 +112,65 @@ function MapComponent({ userPosition, places, selectedPlace }) {
         />
 
         {/* User location */}
-        <Marker position={userPosition}>
-          <Popup>Your Location </Popup>
-        </Marker>
+        {userPosition && ( // Conditionally render marker if userPosition exists
+          <Marker position={userPosition}>
+            <Popup>Your Location</Popup>
+          </Marker>
+        )}
 
         {/* All search markers */}
-        
-          {places.map(
-                    (place) =>
-                      place.center && (
-                        <Marker
-                          key={place.id}
-                          icon={searchIcon(place.markerColor || "darkorange")}
-                          position={[place.center[1], place.center[0]]}
-                        >
-                          <Popup>
-                            <h2 className="font-bold">{place.text || "Unnamed Place"}</h2>
-                            <p className="text-sm">{place.place_name}</p>
-                          </Popup>
-                        </Marker>
-                      )
-                  )}
-        {/* Fly to selected */} 
+        {places.map(
+          (place) =>
+            place.center && (
+              <Marker
+                key={place.id}
+                icon={searchIcon("darkorange")}
+
+                position={[place.center[1], place.center[0]]} // React Leaflet expects [lat, lon]
+              >
+               <Popup>
+                  <div className="max-w-xs">
+                    <h2 className="font-bold text-lg mb-1">{place.tags?.name || place.place_name}</h2>
+                    {place.tags?.amenity && <p><strong>Type:</strong> {place.tags.amenity}</p>}
+                    {place.tags?.shop && <p><strong>Type:</strong> {place.tags.shop}</p>}
+                    {place.tags?.capacity && <p><strong>Capacity:</strong> {place.tags.capacity}</p>}
+                    {place.tags?.opening_hours && <p><strong>Opening Hours:</strong> {place.tags.opening_hours}</p>}
+                    {place.tags?.smoking && <p><strong>Smoking:</strong> {place.tags.smoking}</p>}
+                    {place.tags?.takeaway && <p><strong>Takeaway:</strong> {place.tags.takeaway}</p>}
+                    {(place.tags?.["addr:street"] || place.tags?.["addr:housenumber"] || place.tags?.["addr:postcode"]) && (
+                      <p>
+                        <strong>Address:</strong>{" "}
+                        {[place.tags["addr:housename"], place.tags["addr:housenumber"], place.tags["addr:street"], place.tags["addr:postcode"]]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                    )}
+                    {userPosition && (
+                      <p>
+                        <strong>Distance:</strong>{" "}
+                        {haversineDistance(userPosition, [place.center[1], place.center[0]]).toFixed(2)} km
+                      </p>
+                    )}
+                  </div>
+                </Popup>
+
+              </Marker>
+            )
+        )}
+
+        {/* Fly to selected */}
         {selectedPlace && <FlyToPlace place={selectedPlace} />}
 
-        {/* Line and selected marker */}  
-         {userPosition && selectedPlace?.center && (
-          <>
-            <Polyline
-              positions={[
-                userPosition,
-                [selectedPlace.center[1], selectedPlace.center[0]],
-              ]}
-              color="#0096FF"
-            />
-            <Marker
-              icon={searchIcon("darkorange")}
-              position={[selectedPlace.center[1], selectedPlace.center[0]]}
-            >
-              <Popup>
-                <strong>{selectedPlace.text || "Selected Place"}</strong>
-                <br />
-                {selectedPlace.place_name}
-                <br />
-                Distance:{" "}
-                {haversineDistance(
-                  userPosition,
-                  [selectedPlace.center[1], selectedPlace.center[0]]
-                ).toFixed(2)}{" "}
-                km
-              </Popup>
-            </Marker>
-          </>
+        {/* Driving Route Polyline */}
+        {route && ( // Render the polyline only if route data exists
+          <Polyline
+            positions={route.map(coord => [coord[1], coord[0]])} // Convert [lon, lat] from GeoJSON to [lat, lon] for Leaflet
+            color="#0096FF" // Example color
+            weight={5}     // Example weight
+          />
         )}
-       
+
+        {/* Selected marker (this is separate from the route fetching logic) */}
       </MapContainer>
     </div>
   );
