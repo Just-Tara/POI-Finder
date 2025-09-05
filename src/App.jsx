@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import MapComponent from "./MapComponent";
 import SearchBar from "./SearchBar";
 
+
+const LAGOS_DEFAULT = [6.5244, 3.3792];
 function App() {
   const [userPosition, setUserPosition] = useState(null);
   const [places, setPlaces] = useState([]); 
@@ -32,7 +34,7 @@ useEffect(() => {
       />
       {userPosition && (
         <MapComponent
-          userPosition={userPosition}
+          userPosition={LAGOS_DEFAULT}
           places={places}
           selectedPlace={selectedPlace}
         />
