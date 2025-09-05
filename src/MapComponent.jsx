@@ -128,7 +128,10 @@ return (
                     {(place.tags?.["addr:street"] || place.tags?.["addr:housenumber"] || place.tags?.["addr:postcode"]) && (
                       <p>
                         <strong>Address:</strong>{" "}
-                        {[place.tags["addr:housename"], place.tags["addr:housenumber"], place.tags["addr:street"], place.tags["addr:postcode"]]
+                        {[place.tags["addr:housename"], 
+                            place.tags["addr:housenumber"], 
+                            place.tags["addr:street"], 
+                            place.tags["addr:postcode"]]
                           .filter(Boolean)
                           .join(", ")}
                       </p>

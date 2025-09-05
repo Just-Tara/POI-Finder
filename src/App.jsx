@@ -4,8 +4,8 @@ import SearchBar from "./SearchBar";
 
 function App() {
   const [userPosition, setUserPosition] = useState(null);
-  const [places, setPlaces] = useState([]); // all search results
-  const [selectedPlace, setSelectedPlace] = useState(null); // clicked marker
+  const [places, setPlaces] = useState([]); 
+  const [selectedPlace, setSelectedPlace] = useState(null); 
 
   // Get user location
 
