@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan} from "@fortawesome/free-solid-svg-icons";
+
+
 
 
 function debounce(func, wait) {
@@ -331,7 +335,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       setIsMenuOpen(false);
       addSearchToHistory(poi.name);
 
-      setMessage('Result found');
+      setMessage('Location found');
       setMessageType("success");
     } else {
       setMessage(`No ${poi.name} found near your location.`);
@@ -344,16 +348,15 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
   return (
     <>
       {/* Desktop View */}
-    <div className="search-container hidden lg:flex gap-3 gap-x-3 bg-white shadow-lg flex-col min-h-screen">
-       
+    <div className="search-container hidden lg:flex gap-3 bg-white shadow-lg flex-col min-h-screen">
              <div className="search-box flex border-3 border-orange-500 rounded-xl px-3 py-2">
 
               <input
                 type="text"
                 value={searchQuery}
                 onChange={handleInputChange}
-                placeholder="Search places or addresses..."
-                className="flex-1 h-[40px] focus:outline-none "
+                placeholder="Search Location"
+                className=" flex-1 h-[30px] focus:outline-none "
                 
               />
               <button
@@ -392,19 +395,19 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
             ))}
             <button
               onClick={() => handleQuickSearch("Food Trucks")}
-              className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
+              className="bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
             >
               Food Trucks
             </button>
           </div>
         </div>
         {searchResults.length > 0 && (
-          <ul className="border border-gray-200 rounded-md shadow-sm bg-white max-h-60 overflow-y-auto z-10">
+          <ul className="search-result border border-gray-200 rounded-md shadow-sm bg-white max-h-60 overflow-y-auto z-10">
             {searchResults.map((place) => (
               <li
                 key={place.id}
                 onClick={() => handleSelectPlace(place)}
-                className="p-3 hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+                className="hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
               >
                 {place.place_name}
                 {place.text && <div className="text-xs text-gray-500">{place.text}</div>}
@@ -412,29 +415,30 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
             ))}
           </ul>
         )}
-        <div className="mt-auto pt-4 border-t border-gray-200">
-          <h3 className="text-gray-600 text-sm font-semibold mb-2">Search History</h3>
+        <div className="search-history border-t border-gray-200">
+          <h3 className="text-gray-600 text-lg font-semibold mb-2">Search History</h3>
           {searchHistory.length === 0 ? (
             <p className="text-center text-gray-300 text-xs">No history yet.</p>
           ) : (
             <ul className="text-xs">
               {searchHistory.map((historyItem, index) => (
-                <li key={index} className="mt-2 flex justify-between items-center">
-                  <span
+                <li key={index} className="search-history-list flex justify-between items-center">
+                 <div  className="flex gap-1 cursor-pointer text-gray-600 hover:underline"> <FontAwesomeIcon icon={faRotateRight} className="icon cursor-pointer text-gray-500" /><span
                     onClick={() => {
                       setSearchQuery(historyItem);
                       debouncedHandleSearch(historyItem);
                       handleSelectPlace({ place_name: historyItem, center: userPosition, text: historyItem });
                     }}
-                    className="cursor-pointer hover:underline"
+          
                   >
                     {historyItem}
                   </span>
+                  </div>
                   <button
                     onClick={() => deleteSearchFromHistory(index)}
                     className="cursor-pointer text-gray-400 hover:text-red-500"
                   >
-                    ✕
+                    <FontAwesomeIcon icon={faTrashCan} />
                   </button>
                 </li>
               ))}
@@ -451,116 +455,117 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       >
         ☰
       </button>
+      
 
       {isMenuOpen && (
-       <div className="fixed top-0 bottom-0 z-[1000] flex justify-start lg:hidden bg-black/40"> 
-          <div className="bg-white h-full shadow-lg w-[280px] md:w-[320px] flex flex-col px-6 py-4">
-            <div className="flex flex-col gap-5">
-            <button
+       <div className="fixed inset-0 z-[1000] flex justify-start lg:hidden bg-black/50"> 
+          <div className=" search-container2 gap-3 gap-x-3 bg-white h-full shadow-lg w-[280px] md:w-[320px] flex flex-col">
+           
+             <button
               onClick={() => setIsMenuOpen(false)}
               className="self-end text-2xl text-gray-600 hover:text-red-500 cursor-pointer"
               aria-label="Close search menu"
             >
               ✕
             </button>
-
-
-         
-         <div className="flex border-3 border-orange-500 rounded-xl px-3 py-2">
+       
+             <div className="search-box flex border-3 border-orange-500 rounded-xl px-3 py-2">
 
               <input
                 type="text"
                 value={searchQuery}
                 onChange={handleInputChange}
-                placeholder="Search places or addresses..."
-                className="flex-1 h-[40px] focus:outline-none "
+                placeholder="Search Location"
+                className="flex h-[40px] focus:outline-none "
                 
               />
               <button
                 onClick={handleSearchSubmit}
-                 className="ml-2 w-12 h-[40px] bg-orange-500 text-white rounded-md hover:bg-orange-600 flex justify-center items-center cursor-pointer"
+                 className="w-12 h-[40px] bg-orange-500 text-white rounded-md hover:bg-orange-600 flex justify-center items-center cursor-pointer"
                   >
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </div>
-              {message && (
-              <div
-                className={`text-sm p-2 text-center rounded-md mb-2 ${
-                  messageType === "error"
-                    ? "text-red-500 bg-red-50"
-                    : messageType === "success"
-                    ? "text-gray-700 bg-gray-100"
-                    : "text-green-600 bg-green-50"
-                }`}
-              >
-                {message}
-              </div>
-            )}
-
-            <div className="mb-4">
-              <h3 className="text-md font-semibold text-gray-600 text-center">Quick Search:</h3>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(poiCategories).map(([categoryKey, category]) => (
-                  <button
-                    key={categoryKey}
-                    onClick={() => handleQuickSearch(category.queries[0].name)}
-                    className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
-                  >
-                    {category.label}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handleQuickSearch("Food Trucks")}
-                  className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
-                >
-                  Food Trucks
-                </button>
-              </div>
-            </div>
-            {searchResults.length > 0 && (
-              <ul className="border border-gray-200 rounded-md shadow-sm bg-white max-h-60 overflow-y-auto z-10">
-                {searchResults.map((place) => (
-                  <li
-                    key={place.id}
-                    onClick={() => handleSelectPlace(place)}
-                    className="p-3 hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-                  >
-                    {place.place_name}
-                    {place.text && <div className="text-xs text-gray-500">{place.text}</div>}
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="mt-auto pt-4 border-t border-gray-200">
-              <h3 className="text-gray-600 text-2xl font-semibold mb-2 text-center">Search History</h3>
-              {searchHistory.length === 0 ? (
-                <p className="text-center text-gray-300 text-xs">No history yet.</p>
-              ) : (
-                <ul className="text-xs">
-                  {searchHistory.map((historyItem, index) => (
-                    <li key={index} className="mt-2 flex justify-between items-center">
-                      <span
-                        onClick={() => {
-                          setSearchQuery(historyItem);
-                          debouncedHandleSearch(historyItem);
-                          handleSelectPlace({ place_name: historyItem, center: userPosition, text: historyItem });
-                        }}
-                        className="cursor-pointer hover:underline"
-                      >
-                        {historyItem}
-                      </span>
-                      <button
-                        onClick={() => deleteSearchFromHistory(index)}
-                        className="cursor-pointer text-gray-400 hover:text-red-500"
-                      >
-                        ✕
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+           {message && (
+          <div
+            className={`error-message text-sm p-2 text-center rounded-md mb-2 ${
+              messageType === "error"
+                ? "text-red-500 bg-red-50"
+                : messageType === "success"
+                ? "text-gray-700 bg-gray-100"
+                : "text-green-600 bg-green-50"
+            }`}
+          >
+            {message}
           </div>
+        )}
+
+
+        <div className="quick-search">
+          <h3 className="text-md font-semibold text-gray-600">Quick Search:</h3>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(poiCategories).map(([categoryKey, category]) => (
+              <button
+                key={categoryKey}
+                onClick={() => handleQuickSearch(category.queries[0].name)}
+                className="bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
+              >
+                {category.label}
+              </button>
+            ))}
+            <button
+              onClick={() => handleQuickSearch("Food Trucks")}
+              className="bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
+            >
+              Food Trucks
+            </button>
+          </div>
+        </div>
+        {searchResults.length > 0 && (
+          <ul className="search-result border border-gray-200 rounded-md shadow-sm bg-white max-h-60 overflow-y-auto z-10">
+            {searchResults.map((place) => (
+              <li
+                key={place.id}
+                onClick={() => handleSelectPlace(place)}
+                className="hover:bg-gray-100 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+              >
+                {place.place_name}
+                {place.text && <div className="text-xs text-gray-500">{place.text}</div>}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="search-history border-t border-gray-200">
+          <h3 className="text-gray-600 text-lg font-semibold mb-2">Search History</h3>
+          {searchHistory.length === 0 ? (
+            <p className="text-center text-gray-300 text-xs">No history yet.</p>
+          ) : (
+            <ul className="text-xs">
+              {searchHistory.map((historyItem, index) => (
+                <li key={index} className="search-history-list flex justify-between items-center">
+                 <div  className="flex gap-1 cursor-pointer text-gray-600 hover:underline"> <FontAwesomeIcon icon={faRotateRight} className="icon cursor-pointer text-gray-500" /><span
+                    onClick={() => {
+                      setSearchQuery(historyItem);
+                      debouncedHandleSearch(historyItem);
+                      handleSelectPlace({ place_name: historyItem, center: userPosition, text: historyItem });
+                    }}
+          
+                  >
+                    {historyItem}
+                  </span>
+                  </div>
+                  <button
+                    onClick={() => deleteSearchFromHistory(index)}
+                    className="cursor-pointer text-gray-400 hover:text-red-500"
+                  >
+                    <FontAwesomeIcon icon={faTrashCan} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
           </div>
         </div>
       )}

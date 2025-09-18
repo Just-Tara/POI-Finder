@@ -20,6 +20,11 @@
 .search-box input{
     padding-inline: 20px;
 }
+.search-box button{
+    padding-block: 8px;
+    padding-inline: 12px;
+
+}
 .quick-search{
     margin-bottom: 16px;
 }
@@ -29,4 +34,23 @@
 .quick-search button{
     padding-inline: 12px;
     padding-block: 6px;
+}
+.search-result li{
+    padding: 12px;
+}
+.search-history{
+    margin-top: auto;
+    padding-top: 16px;
+}
+.search-history-list{
+    margin-top: 8px;
+}.icon{
+    margin-top: 2px;
+}
+.search-container2{
+   padding: 20px;
+}
+
+@media only screen and(max-width:765px) {
+   
 }
