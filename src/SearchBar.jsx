@@ -476,7 +476,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
                 value={searchQuery}
                 onChange={handleInputChange}
                 placeholder="Search Location"
-                className="flex h-[40px] focus:outline-none "
+                className="flex-1 h-[40px] focus:outline-none "
                 
               />
               <button
