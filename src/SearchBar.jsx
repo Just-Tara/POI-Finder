@@ -344,26 +344,28 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
   return (
     <>
       {/* Desktop View */}
-      <div className="hidden lg:flex w-[22%] bg-white p-6 shadow-lg flex-col min-h-screen">
-        <h1 className="text-xl font-bold mb-4">Search Locations</h1>
-        <div className="flex mb-4 rounded-md">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleInputChange}
-            placeholder="Search places or addresses..."
-            className="flex-1 p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            onClick={handleSearchSubmit}
-            className="w-16 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 flex justify-center items-center"
-          >
-            <FontAwesomeIcon icon={faMagnifyingGlass} />
-          </button>
-        </div>
+    <div className="search-container hidden lg:flex gap-3 gap-x-3 bg-white shadow-lg flex-col min-h-screen">
+       
+             <div className="search-box flex border-3 border-orange-500 rounded-xl px-3 py-2">
+
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleInputChange}
+                placeholder="Search places or addresses..."
+                className="flex-1 h-[40px] focus:outline-none "
+                
+              />
+              <button
+                onClick={handleSearchSubmit}
+                 className="ml-2 w-12 h-[40px] bg-orange-500 text-white rounded-md hover:bg-orange-600 flex justify-center items-center cursor-pointer"
+                  >
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </button>
+            </div>
            {message && (
           <div
-            className={`text-sm p-2 text-center rounded-md mb-2 ${
+            className={`error-message text-sm p-2 text-center rounded-md mb-2 ${
               messageType === "error"
                 ? "text-red-500 bg-red-50"
                 : messageType === "success"
@@ -376,14 +378,14 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
         )}
 
 
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
+        <div className="quick-search">
+          <h3 className="text-md font-semibold text-gray-600">Quick Search:</h3>
           <div className="flex flex-wrap gap-2">
             {Object.entries(poiCategories).map(([categoryKey, category]) => (
               <button
                 key={categoryKey}
                 onClick={() => handleQuickSearch(category.queries[0].name)}
-                className="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
+                className="bg-gray-100 rounded-full text-xs hover:bg-gray-200 transition-colors text-gray-700 cursor-pointer"
               >
                 {category.label}
               </button>
@@ -444,37 +446,40 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
       {/* Mobile View */}
       <button
         onClick={() => setIsMenuOpen(true)}
-        className="absolute left-3 top-4 z-[1000] p-2 text-3xl cursor-pointer lg:hidden"
+        className="absolute left-3 top-4 z-[1000] text-3xl cursor-pointer lg:hidden"
         aria-label="Open search menu"
       >
         ☰
       </button>
 
       {isMenuOpen && (
-        <div className="fixed inset-0 z-[1000] flex justify-start lg:hidden">
-          <div className="bg-white h-full shadow-lg p-6 w-80 md:w-120 flex flex-col">
+       <div className="fixed top-0 bottom-0 z-[1000] flex justify-start lg:hidden bg-black/40"> 
+          <div className="bg-white h-full shadow-lg w-[280px] md:w-[320px] flex flex-col px-6 py-4">
+            <div className="flex flex-col gap-5">
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="self-end p-2 text-2xl text-gray-600 hover:text-red-500 cursor-pointer"
+              className="self-end text-2xl text-gray-600 hover:text-red-500 cursor-pointer"
               aria-label="Close search menu"
             >
               ✕
             </button>
 
-            <h2 className="text-xl font-semibold mb-4">Search</h2>
 
-            <div className="flex mb-4 rounded-md">
+         
+         <div className="flex border-3 border-orange-500 rounded-xl px-3 py-2">
+
               <input
                 type="text"
                 value={searchQuery}
                 onChange={handleInputChange}
                 placeholder="Search places or addresses..."
-                className="flex-1 p-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="flex-1 h-[40px] focus:outline-none "
+                
               />
               <button
                 onClick={handleSearchSubmit}
-                className="w-16 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 flex justify-center items-center cursor-pointer"
-              >
+                 className="ml-2 w-12 h-[40px] bg-orange-500 text-white rounded-md hover:bg-orange-600 flex justify-center items-center cursor-pointer"
+                  >
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </div>
@@ -493,7 +498,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
             )}
 
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-gray-600 mb-2">Quick Search:</h3>
+              <h3 className="text-md font-semibold text-gray-600 text-center">Quick Search:</h3>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(poiCategories).map(([categoryKey, category]) => (
                   <button
@@ -527,7 +532,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
               </ul>
             )}
             <div className="mt-auto pt-4 border-t border-gray-200">
-              <h3 className="text-gray-600 text-sm font-semibold mb-2">Search History</h3>
+              <h3 className="text-gray-600 text-2xl font-semibold mb-2 text-center">Search History</h3>
               {searchHistory.length === 0 ? (
                 <p className="text-center text-gray-300 text-xs">No history yet.</p>
               ) : (
@@ -555,6 +560,7 @@ const performOverpassSearch = async (filter, categoryName, keyword) => {
                 </ul>
               )}
             </div>
+          </div>
           </div>
         </div>
       )}

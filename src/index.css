@@ -13,3 +13,20 @@
     height: 100vh;
     width: 100vw;
 }
+.search-container{
+    padding: 30px;
+    width: 30%;
+}
+.search-box input{
+    padding-inline: 20px;
+}
+.quick-search{
+    margin-bottom: 16px;
+}
+.quick-search h3{
+    margin-bottom: 8px;
+}
+.quick-search button{
+    padding-inline: 12px;
+    padding-block: 6px;
+}

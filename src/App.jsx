@@ -23,22 +23,26 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen">
+      
       <SearchBar
         userPosition={userPosition}
         setPlaces={setPlaces}
         setSelectedPlace={setSelectedPlace}
       />
+  
+      
       {userPosition ? (
         <MapComponent
           userPosition={userPosition}
           places={places}
           selectedPlace={selectedPlace}
-        />
+        />  
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-gray-600">Getting your location...</p>
         </div>
       )}
+ 
     </div>
   );
 }
